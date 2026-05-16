@@ -17,11 +17,9 @@ jobs:
           ref: master
 
       - name: 仅同步 master 到 Gitee
-        uses: wearerequired/git-mirror-action@v1
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_KEY }}
+        uses: Yikun/action-mirror@master
         with:
-          source-repo: "git@github.com:t717796163/AzurPilot.git"
-          destination-repo: "git@gitee.com:t717796163/AzurPilot.git"
-          force: true
-          refspec: "refs/heads/master:refs/heads/master"
+          src: 'https://github.com/t717796163/AzurPilot.git'
+          dst: 'https://t717796163:${{ secrets.GITEE_TOKEN }}@gitee.com/t717796163/AzurPilot.git'
+          static_list: 'master'
+          force_update: true
