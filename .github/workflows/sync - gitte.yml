@@ -16,10 +16,15 @@ jobs:
           fetch-depth: 0
           ref: master
 
-      - name: 仅同步 master 到 Gitee
-        uses: Yikun/action-mirror@master
-        with:
-          src: 'https://github.com/t717796163/AzurPilot.git'
-          dst: 'https://t717796163:${{ secrets.GITEE_TOKEN }}@gitee.com/t717796163/AzurPilot.git'
-          static_list: 'master'
-          force_update: true
+      - name: 配置 Git 用户
+        run: |
+          git config --global user.name "t717796163"
+          git config --global user.email "t717796163@users.noreply.github.com"
+
+      - name: 添加 Gitee 远程仓库
+        run: |
+          git remote add gitee https://t717796163:${{ secrets.GITEE_TOKEN }}@gitee.com/t717796163/AzurPilot.git || true
+
+      - name: 强制推送 master 分支到 Gitee
+        run: |
+          git push -f gitee master:master
