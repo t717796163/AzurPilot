@@ -1,30 +1,37 @@
-name: 仅同步 master 到 Gitee
+name: 同步到 Gitee（优化版）
 on:
-  workflow_run:
-    workflows: ["全自动整体同步"]
-    types:
-      - completed
+  push:
+    branches: [master]
   workflow_dispatch:
 
 jobs:
-  sync-to-gitee:
+  sync:
     runs-on: ubuntu-latest
     steps:
-      - name: 拉取 master 分支代码
+      - name: 设置 Git 配置
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions@github.com"
+          # 增大缓冲区，避免大文件问题
+          git config --global http.postBuffer 524288000
+
+      - name: 拉取代码
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          ref: master
+          fetch-depth: 1  # 浅克隆，减少数据量
 
-      - name: 配置 Git 用户
+      - name: 配置 Git 代理（可选）
         run: |
-          git config --global user.name "t717796163"
-          git config --global user.email "t717796163@users.noreply.github.com"
+          # 如果需要代理，取消注释并配置
+          # git config --global http.proxy http://proxy-server:port
+          # git config --global https.proxy http://proxy-server:port
 
-      - name: 添加 Gitee 远程仓库
-        run: |
-          git remote add gitee https://t717796163:${{ secrets.GITEE_TOKEN }}@gitee.com/t717796163/AzurPilot.git || true
-
-      - name: 强制推送 master 分支到 Gitee
-        run: |
-          git push -f gitee master:master
+      - name: 同步到 Gitee
+        uses: wearerequired/git-mirror-action@master
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.GITEE_SSH_PRIVATE_KEY }}
+        with:
+          source-repo: "https://github.com/t717796163/AzurPilot.git"
+          destination-repo: "git@gitee.com:t717796163/AzurPilot.git"
+          source-branch: "master"
+          destination-branch: "master"
