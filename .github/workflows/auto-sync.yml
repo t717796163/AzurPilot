@@ -1,6 +1,4 @@
-# 全自动一条龙同步：上游→master→my-mod
 name: 全自动整体同步
-# 定时每15分钟自动跑，也支持手动触发
 on:
   schedule:
     - cron: "0,15,30,45 * * * *"
@@ -10,37 +8,26 @@ jobs:
   full_sync:
     runs-on: ubuntu-latest
     steps:
-      # 拉取仓库全部代码与分支
       - name: 拉取完整仓库代码
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # 配置提交用户信息
       - name: 配置Git用户
         run: |
           git config --global user.name "Sync Bot"
           git config --global user.email "sync@bot.com"
 
-      # 第一步：隔空强制纯净更新 master（无多余提交）
       - name: 同步上游最新到master
         run: |
-          # 绑定原作者仓库
-          git remote add upstream https://github.com/wess09/AzurPilot.git
+          git remote add upstream https://github.com/wess09/AzurPilot.git || git remote set-url upstream https://github.com/wess09/AzurPilot.git
           git fetch upstream
-          # 切换到master分支
-          git checkout master
-          # 强行对齐原版，清空所有额外内容，保持纯白
-          git reset --hard upstream/master
-          # 推送纯净master，无任何新增文件提交
+          # 直接重置本地master到上游版本，跳过checkout歧义问题
+          git checkout -B master upstream/master
           git push -f origin master
 
-      # 第二步：把最新master自动合并进自己的my-mod分支
       - name: 合并最新master到my-mod
         run: |
-          # 切换到自己使用的分支
           git checkout my-mod
-          # 合并master最新更新，保留自己所有修改
           git merge origin/master --no-edit || true
-          # 推送更新后的自用分支
           git push origin my-mod
