@@ -1,37 +1,24 @@
-name: 同步到 Gitee（优化版）
+name: Sync to Gitee
 on:
   push:
-    branches: [master]
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
-  sync:
+  repo-sync:
     runs-on: ubuntu-latest
     steps:
-      - name: 设置 Git 配置
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "github-actions@github.com"
-          # 增大缓冲区，避免大文件问题
-          git config --global http.postBuffer 524288000
+      - uses: actions/checkout@v4
 
-      - name: 拉取代码
-        uses: actions/checkout@v4
+      - name: Sync GitHub -> Gitee (Only master)
+        uses: Yikun/hub-mirror-action@master
         with:
-          fetch-depth: 1  # 浅克隆，减少数据量
-
-      - name: 配置 Git 代理（可选）
-        run: |
-          # 如果需要代理，取消注释并配置
-          # git config --global http.proxy http://proxy-server:port
-          # git config --global https.proxy http://proxy-server:port
-
-      - name: 同步到 Gitee
-        uses: wearerequired/git-mirror-action@master
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_SSH_PRIVATE_KEY }}
-        with:
-          source-repo: "https://github.com/t717796163/AzurPilot.git"
-          destination-repo: "git@gitee.com:t717796163/AzurPilot.git"
-          source-branch: "master"
-          destination-branch: "master"
+          src: github/t717796163
+          dst: gitee/t717796163
+          # 用 HTTPS 方式，避免 SSH 权限问题
+          dst_token: ${{ secrets.GITEE_TOKEN }}
+          account_type: user
+          static_list: "AzurPilot"
+          white_list: "master" # 关键：只同步 master 分支
+          force_update: true
