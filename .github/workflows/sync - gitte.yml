@@ -11,14 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Sync GitHub -> Gitee (Only master)
+      - name: Sync GitHub -> Gitee (master 分支)
         uses: Yikun/hub-mirror-action@master
         with:
-          src: github/t717796163
-          dst: gitee/t717796163
-          # 用 HTTPS 方式，避免 SSH 权限问题
+          src: github/t717796163/AzurPilot
+          dst: gitee/t717796163/AzurPilot
           dst_token: ${{ secrets.GITEE_TOKEN }}
           account_type: user
-          static_list: "AzurPilot"
-          white_list: "master" # 关键：只同步 master 分支
           force_update: true
+          # 只同步 master 分支
+          branch_white_list: "master"
