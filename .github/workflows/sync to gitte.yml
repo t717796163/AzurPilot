@@ -14,13 +14,13 @@ jobs:
       - name: Sync GitHub -> Gitee
         uses: Yikun/hub-mirror-action@master
         with:
-          # 正确格式：用户名/仓库名
-          src: t717796163/AzurPilot
-          dst: t717796163/AzurPilot
-          # 用 Gitee Token 认证
+          # 源平台/用户名
+          src: github/t717796163
+          # 目标平台/用户名
+          dst: gitee/t717796163
+          # Gitee 的私人令牌（需要在 Secrets 中配置 GITEE_TOKEN）
           dst_token: ${{ secrets.GITEE_TOKEN }}
           account_type: user
-          # 强制更新，解决提交冲突
           force_update: true
-          # 关键：只同步 master 分支
+          # 要同步的仓库列表（格式：仓库名:分支）
           static_list: "AzurPilot:master"
