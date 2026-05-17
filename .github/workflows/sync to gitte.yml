@@ -17,5 +17,5 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.GITEE_SSH_KEY }}
         with:
-          source-repo: "git@github.com:t717796163/Azurpilot.git"
+          source-repo: "git@github.com:t717796163/AzurPilot.git"
           destination-repo: "git@gitee.com:t717796163/Azurpilot.git"
