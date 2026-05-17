@@ -7,10 +7,6 @@ on:
 jobs:
   full_sync:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      workflows: write
-
     steps:
       - name: 拉取完整仓库代码
         uses: actions/checkout@v4
