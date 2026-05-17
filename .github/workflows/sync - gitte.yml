@@ -1,4 +1,4 @@
-name: Sync to Gitee
+name: Sync GitHub -> Gitee (master 分支)
 on:
   push:
     branches:
@@ -11,13 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Sync GitHub -> Gitee (master 分支)
+      - name: Sync GitHub -> Gitee
         uses: Yikun/hub-mirror-action@master
         with:
-          src: github/t717796163/AzurPilot
-          dst: gitee/t717796163/AzurPilot
+          # 正确格式：用户名/仓库名
+          src: t717796163/AzurPilot
+          dst: t717796163/AzurPilot
+          # 用 Gitee Token 认证
           dst_token: ${{ secrets.GITEE_TOKEN }}
           account_type: user
+          # 强制更新，解决提交冲突
           force_update: true
-          # 只同步 master 分支
-          branch_white_list: "master"
+          # 关键：只同步 master 分支
+          static_list: "AzurPilot:master"
