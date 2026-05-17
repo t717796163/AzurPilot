@@ -1,4 +1,4 @@
-name: Sync GitHub to Gitee (代理版)
+name: Sync GitHub to Gitee
 on:
   push:
     branches: [ master ]
@@ -7,24 +7,11 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup proxy & push
+      - name: Push to Gitee 国内高速地址
         run: |
-          # 配置代理（解决443端口超时）
-          export https_proxy=http://127.0.0.1:7890
-          export http_proxy=http://127.0.0.1:7890
-          export all_proxy=socks5://127.0.0.1:7890
-          
-          # 配置Git网络参数
-          git config --global http.lowSpeedLimit 1000
-          git config --global http.lowSpeedTime 30
-          git config --global http.postBuffer 524288000
-          
-          # 用gitee.com.cn镜像
-          git push --force https://${{ secrets.GITEE_TOKEN }}@gitee.com.cn/t717796163/AzurPilot.git HEAD:master
+          git push --force https://${{ secrets.GITEE_TOKEN }}@gitee.com/t717796163/Azurpilot.git HEAD:master
