@@ -7,6 +7,11 @@ on:
 jobs:
   full_sync:
     runs-on: ubuntu-latest
+    # ✅ 下面这两行是修复权限报错的关键，其他完全不变
+    permissions:
+      workflows: write
+      contents: write
+
     steps:
       - name: 拉取完整仓库代码
         uses: actions/checkout@v4
