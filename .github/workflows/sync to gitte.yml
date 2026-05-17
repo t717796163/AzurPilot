@@ -1,4 +1,4 @@
-name: Sync GitHub to Gitee
+name: Sync GitHub master to Gitee master
 on:
   push:
     branches: [ master ]
@@ -12,19 +12,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: master
 
-      - name: Git 网络优化配置
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git config --global http.lowSpeedLimit 512
-          git config --global http.lowSpeedTime 20
-          git config --global http.postBuffer 524288000
-
-      - name: 推送至 Gitee
+      - name: Push to Gitee master
         env:
-          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+          TOKEN: ${{ secrets.GITEE_TOKEN }}
         run: |
-          git remote remove gitee 2>/dev/null || true
-          git remote add gitee https://${GITEE_TOKEN}@gitee.com/t717796163/AzurPilot.git
-          git push --force gitee master
+          git remote add gitee https://${TOKEN}@gitee.com/t717796163/AzurPilot.git
+          git push -f gitee master:master
