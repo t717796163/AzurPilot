@@ -12,6 +12,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Push to Gitee 国内高速地址
-        run: |
-          git push --force https://${{ secrets.GITEE_TOKEN }}@gitee.com/t717796163/Azurpilot.git HEAD:master
+      - name: Mirror to Gitee
+        uses: wearerequired/git-mirror-action@master
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.GITEE_SSH_KEY }}
+        with:
+          source-repo: "git@github.com:t717796163/Azurpilot.git"
+          destination-repo: "git@gitee.com:t717796163/Azurpilot.git"
