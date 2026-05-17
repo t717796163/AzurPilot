@@ -1,26 +1,28 @@
-name: Sync to Gitee (SSH 稳定版)
+name: Sync GitHub to Gitee
 on:
   push:
-    branches: [master]
-  workflow_dispatch:
+    branches: [ master ]
+  workflow_dispatch
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # 安装 SSH 并配置 Gitee 私钥
-      - name: Setup SSH
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.GITEE_SSH_KEY }}
-          known_hosts: gitee.com
-
-      # 直接推送到 Gitee（不重新拉代码！）
-      - name: Push to Gitee
+      - name: Git config
         run: |
-          git remote add gitee git@gitee.com:t717796163/Azurpilot.git
-          git push --force gitee HEAD:master
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git config --global http.lowSpeedLimit 512
+          git config --global http.lowSpeedTime 20
+
+      - name: Push to Gitee
+        env:
+          TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          git remote add gitee https://${TOKEN}@gitee.com/t717796163/AzurPilot.git
+          git push --force gitee master
