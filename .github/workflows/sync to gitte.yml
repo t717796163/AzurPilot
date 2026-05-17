@@ -1,26 +1,16 @@
-name: Sync GitHub -> Gitee (master 分支)
+name: Sync to Gitee
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
-  repo-sync:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Sync GitHub -> Gitee
-        uses: Yikun/hub-mirror-action@master
         with:
-          # 源平台/用户名
-          src: github/t717796163
-          # 目标平台/用户名
-          dst: gitee/t717796163
-          # Gitee 的私人令牌（需要在 Secrets 中配置 GITEE_TOKEN）
-          dst_token: ${{ secrets.GITEE_TOKEN }}
-          account_type: user
-          force_update: true
-          # 要同步的仓库列表（格式：仓库名:分支）
-          static_list: "AzurPilot:master"
+          fetch-depth: 0
+      - name: Push to Gitee
+        run: |
+          git push --force https://${{ secrets.GITEE_TOKEN }}@gitee.com/t717796163/AzurPilot.git HEAD:master
