@@ -1,4 +1,4 @@
-name: Sync GitHub master to Gitee master
+name: Sync GitHub master → Gitee master
 on:
   push:
     branches: [ master ]
@@ -7,16 +7,19 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 2
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: master
 
-      - name: Push to Gitee master
-        env:
-          TOKEN: ${{ secrets.GITEE_TOKEN }}
+      - name: Setup SSH
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.GITEE_SSH_KEY }}
+          known_hosts: gitee.com
+
+      - name: Push to Gitee
         run: |
-          git remote add gitee https://${TOKEN}@gitee.com/t717796163/AzurPilot.git
+          git remote add gitee git@gitee.com:t717796163/AzurPilot.git
           git push -f gitee master:master
