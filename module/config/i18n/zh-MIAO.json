@@ -1828,10 +1828,11 @@
     "Mode": {
       "name": "难度喵",
       "help": "SP图需用活动每日SP运行喵。 (´・ω・`)",
-      "easy": "easy喵",
-      "normal": "normal喵",
-      "hard": "hard喵",
-      "sp": "sp喵"
+      "tc1": "tc1",
+      "tc2": "tc2",
+      "tc3": "tc3",
+      "sp": "sp喵",
+      "ex": "ex"
     },
     "Fleet": {
       "name": "出击队伍模式",
@@ -2013,6 +2014,9 @@
       "name": "科研过滤器",
       "help": "科研掉落和刷新见 https://azur-stats.lyoko.io/ ，没了解别自定义。预优化过滤器喵。",
       "custom": "自定义喵",
+      "series_9_blueprint_ta152": "九期 蓝图+Ta152喵",
+      "series_9_blueprint_only": "九期 仅蓝图喵",
+      "series_9_ta152_only": "九期 仅Ta152喵",
       "series_8_blueprint_305": "八期 蓝图+305喵",
       "series_8_blueprint_only": "八期 仅蓝图喵",
       "series_8_305_only": "八期 仅305喵",
