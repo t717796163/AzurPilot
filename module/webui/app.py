@@ -2850,25 +2850,34 @@ class AlasGUI(Frame):
 
         self.task_handler.add(log.put_log(pm), 0.25, True)
 
-    def _windowsml_device_select_options(self, current_value):
+    def _windowsml_device_select_options(self, current_value, install_missing_ep=False):
         current_value = str(current_value or "auto")
         options = []
         labels = []
+        unavailable_text = {
+            "zh-CN": "当前不可用",
+            "zh-MIAO": "当前不可用",
+            "en-US": "Currently unavailable",
+            "ja-JP": "現在利用できません",
+            "zh-TW": "目前不可用",
+        }.get(lang.LANG, "Currently unavailable")
         try:
             from module.ocr.windowsml import windowsml_device_options
 
-            detected_options = windowsml_device_options()
+            detected_options = windowsml_device_options(
+                install_missing_ep=install_missing_ep
+            )
         except Exception as exc:
             logger.warning(f"Failed to detect Windows ML OCR devices: {exc}")
-            detected_options = [("auto", t("Optimization.OcrWindowsMlDevice.auto"))]
+            detected_options = [("auto", t("Optimization.OcrDevice.auto"))]
 
         for value, label in detected_options:
             options.append(value)
-            labels.append(t("Optimization.OcrWindowsMlDevice.auto") if value == "auto" else label)
+            labels.append(t("Optimization.OcrDevice.auto") if value == "auto" else label)
 
         if current_value not in options:
             options.append(current_value)
-            labels.append(f"{current_value} ({t('Optimization.OcrWindowsMlDevice.unavailable')})")
+            labels.append(f"{current_value} ({unavailable_text})")
 
         return options, labels
 
@@ -2910,7 +2919,19 @@ class AlasGUI(Frame):
             options_label = None
             if group_name == "Optimization" and arg_name == "OcrWindowsMlDevice":
                 output_kwargs["widget_type"] = "select"
-                options, options_label = self._windowsml_device_select_options(value)
+                install_missing_ep = deep_get(
+                    config,
+                    [task, group_name, "OcrWindowsMlInstallEp"],
+                    deep_get(
+                        config,
+                        ["Alas", group_name, "OcrWindowsMlInstallEp"],
+                        False,
+                    ),
+                )
+                options, options_label = self._windowsml_device_select_options(
+                    value,
+                    install_missing_ep=bool(install_missing_ep),
+                )
             server = to_server(deep_get(config, "Alas.Emulator.PackageName", "cn"))
             available_events = deep_get(
                 self.ALAS_ARGS, keys=f"{task}.{group_name}.{arg_name}.option_{server}"

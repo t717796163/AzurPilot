@@ -93,7 +93,12 @@ def _device_type_name(device):
     return getattr(device_type, "name", str(device_type)).upper()
 
 
-def windowsml_device_options(ort=None):
+def windowsml_device_options(ort=None, install_missing_ep=False):
+    if ort is None:
+        import onnxruntime as ort
+
+    ensure_windows_ml_execution_providers(ort, install_missing_ep)
+
     options = [("auto", "自动选择最佳硬件")]
     for device in iter_ort_device_candidates("gpu", ort):
         if device.device_type == "CPU" or device.ep_name == CPU_EP:
