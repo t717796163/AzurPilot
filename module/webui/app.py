@@ -2850,6 +2850,28 @@ class AlasGUI(Frame):
 
         self.task_handler.add(log.put_log(pm), 0.25, True)
 
+    def _windowsml_device_select_options(self, current_value):
+        current_value = str(current_value or "auto")
+        options = []
+        labels = []
+        try:
+            from module.ocr.windowsml import windowsml_device_options
+
+            detected_options = windowsml_device_options()
+        except Exception as exc:
+            logger.warning(f"Failed to detect Windows ML OCR devices: {exc}")
+            detected_options = [("auto", t("Optimization.OcrWindowsMlDevice.auto"))]
+
+        for value, label in detected_options:
+            options.append(value)
+            labels.append(t("Optimization.OcrWindowsMlDevice.auto") if value == "auto" else label)
+
+        if current_value not in options:
+            options.append(current_value)
+            labels.append(f"{current_value} ({t('Optimization.OcrWindowsMlDevice.unavailable')})")
+
+        return options, labels
+
     @use_scope("groups")
     def set_group(self, group, arg_dict, config, task):
         group_name = group[0]
@@ -2885,16 +2907,21 @@ class AlasGUI(Frame):
             output_kwargs["value"] = value
             # Options
             options = output_kwargs.pop("option", [])
+            options_label = None
+            if group_name == "Optimization" and arg_name == "OcrWindowsMlDevice":
+                output_kwargs["widget_type"] = "select"
+                options, options_label = self._windowsml_device_select_options(value)
             server = to_server(deep_get(config, "Alas.Emulator.PackageName", "cn"))
             available_events = deep_get(
                 self.ALAS_ARGS, keys=f"{task}.{group_name}.{arg_name}.option_{server}"
             )
-            if available_events is not None:
+            if options_label is None and available_events is not None:
                 options = [opt for opt in options if opt in available_events]
 
             server_options = output_kwargs.get(f"option_{server}")
             if (
-                output_kwargs["widget_type"] == "select"
+                options_label is None
+                and output_kwargs["widget_type"] == "select"
                 and isinstance(server_options, list)
                 and server_options
             ):
@@ -2913,9 +2940,10 @@ class AlasGUI(Frame):
                 if only_option in output_kwargs.get("option_bold", []):
                     output_kwargs["widget_type"] = "state"
             # Options label
-            options_label = []
-            for opt in options:
-                options_label.append(t(f"{group_name}.{arg_name}.{opt}"))
+            if options_label is None:
+                options_label = []
+                for opt in options:
+                    options_label.append(t(f"{group_name}.{arg_name}.{opt}"))
             output_kwargs["options_label"] = options_label
             # Help
             arg_help = t(f"{group_name}.{arg_name}.help")

@@ -239,6 +239,10 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig, ConfigWatcher
         return bool(getattr(self, "Optimization_OcrWindowsMlInstallEp", False))
 
     @property
+    def ocr_windowsml_device(self) -> str:
+        return str(getattr(self, "Optimization_OcrWindowsMlDevice", "auto") or "auto")
+
+    @property
     def hoarding(self):
         minutes = int(
             deep_get(

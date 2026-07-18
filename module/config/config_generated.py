@@ -127,6 +127,7 @@ class GeneratedConfig:
 
     # 配置组 `Optimization`
     Optimization_OcrDevice = 'auto'  # auto, cpu, gpu, ane
+    Optimization_OcrWindowsMlDevice = 'auto'
     Optimization_OcrWindowsMlInstallEp = True
     Optimization_OcrBackend = 'auto'  # auto, onnxruntime, ncnn
     Optimization_OcrModelVersionEnglish = 'auto'  # auto, alocr_en_900k, azur_lane_v6_6, azur_lane_v6_5, ppocr_v6, alocr_en_v2_6, alocr_en_v2_0, alocr_en_v1_0

@@ -107,6 +107,7 @@
     },
     "Optimization": {
       "OcrDevice": "auto",
+      "OcrWindowsMlDevice": "auto",
       "OcrWindowsMlInstallEp": true,
       "OcrBackend": "auto",
       "OcrModelVersionEnglish": "auto",
