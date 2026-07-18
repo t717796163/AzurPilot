@@ -743,6 +743,10 @@
       "gpu": "Hardware Acceleration",
       "ane": "ANE (Apple)"
     },
+    "OcrWindowsMlDevice": {
+      "name": "Windows ML Device",
+      "help": "Choose the actual Windows ML device used by OCR. This only applies when OCR Device is Hardware Acceleration and the backend is ONNX Runtime. Auto sorts devices by NPU > vendor GPU EP > DirectML GPU > CPU. Manual selection pins OCR to the selected device to avoid choosing an integrated GPU."
+    },
     "OcrWindowsMlInstallEp": {
       "name": "Install Windows ML Vendor EPs",
       "help": "When enabled, AzurPilot uses Windows ML to automatically install and register vendor execution providers supported by this device for NPU or dedicated GPU acceleration. Failures are skipped and OCR falls back to existing hardware or CPU.\nMicrosoft docs: https://learn.microsoft.com/en-us/windows/ai/new-windows-ml/initialize-execution-providers?tabs=python"

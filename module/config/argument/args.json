@@ -507,6 +507,11 @@
           "ane"
         ]
       },
+      "OcrWindowsMlDevice": {
+        "type": "input",
+        "value": "auto",
+        "valuetype": "str"
+      },
       "OcrWindowsMlInstallEp": {
         "type": "checkbox",
         "value": true
