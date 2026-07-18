@@ -66,6 +66,10 @@ def _ocr_windowsml_install_ep():
     return bool(getattr(config, "ocr_windowsml_install_ep", False))
 
 
+def _ocr_windowsml_device():
+    return getattr(config, "ocr_windowsml_device", "auto")
+
+
 class AlTextRecognizer(TextRecognizer):
     """使用项目自定义 ONNXRuntime session 的 RapidOCR 识别器。"""
 
@@ -76,6 +80,7 @@ class AlTextRecognizer(TextRecognizer):
             cfg,
             device=device,
             install_missing_ep=_ocr_windowsml_install_ep(),
+            windowsml_device=_ocr_windowsml_device(),
         )
 
         character, character_dict_path = self.get_character_dict(cfg)
@@ -112,6 +117,7 @@ class AlTextDetector(TextDetector):
             cfg,
             device=device,
             install_missing_ep=_ocr_windowsml_install_ep(),
+            windowsml_device=_ocr_windowsml_device(),
         )
 
 
@@ -196,6 +202,7 @@ class AlOcrCtcRecOCR:
             self.model_path,
             preference=device,
             install_missing_ep=_ocr_windowsml_install_ep(),
+            windowsml_device=_ocr_windowsml_device(),
         )
         self.input_names = [item.name for item in self.session.get_inputs()]
         logger.info(

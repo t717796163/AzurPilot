@@ -32,10 +32,21 @@ class OrtDeviceInfo:
     raw: Any
 
     @property
+    def value(self) -> str:
+        return _device_value(self)
+
+    @property
     def label(self) -> str:
         parts = [self.ep_name, self.device_type]
         if self.description:
             parts.append(self.description)
+        metadata = _device_metadata(self.raw)
+        luid = metadata.get("LUID")
+        adapter = metadata.get("DxgiAdapterNumber")
+        if luid:
+            parts.append(f"LUID {luid}")
+        elif adapter:
+            parts.append(f"DXGI {adapter}")
         return " / ".join(parts)
 
 
@@ -57,9 +68,43 @@ def _parse_video_memory_mb(metadata):
     return 0
 
 
+def _device_metadata(ep_device):
+    device = getattr(ep_device, "device", None)
+    if device is None:
+        return {}
+    return dict(getattr(device, "metadata", {}) or {})
+
+
+def _device_value(device):
+    metadata = _device_metadata(device.raw)
+    identity = metadata.get("LUID") or metadata.get("DxgiAdapterNumber") or device.description
+    return "|".join(
+        [
+            device.ep_name,
+            device.device_type,
+            device.vendor,
+            str(identity or ""),
+        ]
+    )
+
+
 def _device_type_name(device):
     device_type = getattr(device, "type", "")
     return getattr(device_type, "name", str(device_type)).upper()
+
+
+def windowsml_device_options(ort=None, install_missing_ep=False):
+    if ort is None:
+        import onnxruntime as ort
+
+    ensure_windows_ml_execution_providers(ort, install_missing_ep)
+
+    options = [("auto", "自动选择最佳硬件")]
+    for device in iter_ort_device_candidates("gpu", ort):
+        if device.device_type == "CPU" or device.ep_name == CPU_EP:
+            continue
+        options.append((device.value, device.label))
+    return options
 
 
 def _build_session_options(ort, engine_cfg=None):
@@ -274,9 +319,22 @@ def _create_coreml_session(ort, model_path, engine_cfg):
     )
 
 
-def _create_windows_hardware_session(ort, model_path, engine_cfg, install_missing_ep):
+def _create_windows_hardware_session(
+    ort,
+    model_path,
+    engine_cfg,
+    install_missing_ep,
+    windowsml_device,
+):
     ensure_windows_ml_execution_providers(ort, install_missing_ep)
     candidates = iter_ort_device_candidates("gpu", ort)
+    if windowsml_device and windowsml_device != "auto":
+        selected = [device for device in candidates if device.value == windowsml_device]
+        if not selected:
+            logger.warning(f"Selected Windows ML OCR device is unavailable: {windowsml_device}")
+            return _create_cpu_session(ort, model_path, engine_cfg)
+        candidates = selected
+
     for device in candidates:
         if device.device_type == "CPU" or device.ep_name == CPU_EP:
             continue
@@ -289,6 +347,10 @@ def _create_windows_hardware_session(ort, model_path, engine_cfg, install_missin
             return session
         except Exception as exc:
             logger.warning(f"Windows ML OCR provider failed: {device.label}, {exc}")
+
+    if windowsml_device and windowsml_device != "auto":
+        logger.warning("Selected Windows ML OCR device failed, falling back to CPU")
+        return _create_cpu_session(ort, model_path, engine_cfg)
 
     available = ort.get_available_providers()
     if DML_EP in available:
@@ -312,6 +374,7 @@ def create_ort_session(
     preference="auto",
     engine_cfg=None,
     install_missing_ep=False,
+    windowsml_device="auto",
 ):
     import onnxruntime as ort
 
@@ -334,19 +397,27 @@ def create_ort_session(
             model_path,
             engine_cfg,
             install_missing_ep,
+            windowsml_device,
         )
 
     return _create_cpu_session(ort, model_path, engine_cfg)
 
 
 class AlOrtInferSession:
-    def __init__(self, cfg, device="cpu", install_missing_ep=False):
+    def __init__(
+        self,
+        cfg,
+        device="cpu",
+        install_missing_ep=False,
+        windowsml_device="auto",
+    ):
         self.model_path = Path(_cfg_get(cfg, "model_path"))
         self.session = create_ort_session(
             self.model_path,
             preference=device,
             engine_cfg=_cfg_get(cfg, "engine_cfg"),
             install_missing_ep=install_missing_ep,
+            windowsml_device=windowsml_device,
         )
 
     def __call__(self, input_content: np.ndarray) -> np.ndarray:

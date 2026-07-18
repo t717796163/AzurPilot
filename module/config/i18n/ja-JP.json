@@ -743,6 +743,10 @@
       "gpu": "ハードウェアアクセラレーション",
       "ane": "ANE (Apple)"
     },
+    "OcrWindowsMlDevice": {
+      "name": "Windows ML デバイス",
+      "help": "OCR で使用する実際の Windows ML デバイスを選択します。OCR デバイスがハードウェアアクセラレーションで、バックエンドが ONNX Runtime の場合のみ有効です。自動選択は NPU > ベンダー GPU EP > DirectML GPU > CPU の順で並べます。手動選択すると、内蔵 GPU が自動選択されることを避けるため、選択したデバイスに固定します。"
+    },
     "OcrWindowsMlInstallEp": {
       "name": "Windows ML ベンダー EP をインストール",
       "help": "有効にすると、Windows ML を通してこのデバイスが対応するベンダー実行プロバイダーを自動インストールおよび登録し、NPU または専用 GPU 加速に使用します。失敗時はスキップし、既存のハードウェアまたは CPU にフォールバックします。\nMicrosoft docs: https://learn.microsoft.com/ja-jp/windows/ai/new-windows-ml/initialize-execution-providers?tabs=python"

@@ -743,6 +743,10 @@
       "gpu": "硬體加速",
       "ane": "ANE (Apple)"
     },
+    "OcrWindowsMlDevice": {
+      "name": "Windows ML 裝置",
+      "help": "選擇 Windows ML OCR 使用的實際裝置。僅在 OCR 裝置為「硬體加速」且後端為 ONNX Runtime 時生效。自動選擇會按 NPU > 廠商 GPU EP > DirectML GPU > CPU 排序；手動選擇後會固定使用所選裝置，避免自動選到內顯。"
+    },
     "OcrWindowsMlInstallEp": {
       "name": "安裝 Windows ML 廠商 EP",
       "help": "啟用後會嘗試透過 Windows ML 自動安裝並註冊裝置支援的廠商執行提供者，用於 NPU 或專用 GPU 加速。失敗時會略過並回退到已可用的硬體或 CPU。\nMicrosoft docs: https://learn.microsoft.com/zh-tw/windows/ai/new-windows-ml/initialize-execution-providers?tabs=python"
